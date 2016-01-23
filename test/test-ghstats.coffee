@@ -1,7 +1,7 @@
 Helper = require 'hubot-test-helper'
 assert = require 'power-assert'
 
-describe 'gyotaku', ->
+describe 'ghstats', ->
   room = null
 
   beforeEach ->

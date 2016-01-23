@@ -1,0 +1,53 @@
+{
+  "name": "hubot-github-contribution-stats",
+  "description": "Notify GitHub Contributions and Streaks",
+  "version": "0.0.0",
+  "author": "moqada <moqada@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/moqada/hubot-github-contribution-stats/issues"
+  },
+  "dependencies": {
+    "cheerio": "^0.19.0",
+    "github-contribution-stats": "^0.1.0",
+    "gyazo-api": "^0.3.0",
+    "moment": "^2.11.1",
+    "svg2png": "^3.0.0",
+    "tempfile": "^1.1.1"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.10.0",
+    "coffeelint": "^1.14.2",
+    "coffeelint-config-moqada": "^1.0.0",
+    "espower-coffee": "^1.0.1",
+    "hubot": "^2.18.0",
+    "hubot-test-helper": "^1.4.4",
+    "mocha": "^2.3.4",
+    "npm-run-all": "^1.5.0",
+    "power-assert": "^1.2.0"
+  },
+  "files": [
+    "index.coffee",
+    "src"
+  ],
+  "homepage": "https://github.com/moqada/hubot-github-contribution-stats#readme",
+  "keywords": [
+    "contributions",
+    "github",
+    "hubot",
+    "hubot-scripts",
+    "streaks"
+  ],
+  "license": "MIT",
+  "main": "index.coffee",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moqada/hubot-github-contribution-stats.git"
+  },
+  "scripts": {
+    "lint": "coffeelint src test",
+    "robot": "hubot",
+    "test": "npm-run-all lint test:*",
+    "test:src": "mocha",
+    "watch": "mocha --watch {src/**/,test}/*.coffee"
+  }
+}

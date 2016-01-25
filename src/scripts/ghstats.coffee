@@ -1,10 +1,11 @@
+# coffeelint: disable=max_line_length
 # Description
 #   Notify GitHub Contributions and Streaks.
 #
 # Commands:
 #   hubot ghstats <username> [text] - Show user's GitHub contributions and streaks
 #   hubot ghstats <username> notify [text|only] - Notify user's GitHub contributions
-#   hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] - Notify user's GitHub contributions with mention
+#   hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
 #
 # Configuration:
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE - Set message for error
@@ -39,8 +40,8 @@ GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 
 module.exports = (robot) ->
 
-  robot.respond /ghstats\s+([^\s]+)\s+notify(?:\s+(?:(?:@|\[@\])([^\s]+)))?(?:\s+(text|only))?$/i, (res) ->
-    [username, mention, option] = res.match.slice(1)
+  robot.respond /ghstats\s+([^\s]+)\s+notify(?:\s+(?:(?:@|\[@\])([^\s]+)))?(?:\s+(text|only))?(?:\s+(failed-only))?$/i, (res) ->
+    [username, mention, option, failedOnly] = res.match.slice(1)
     ghstats.fetchStats(username)
       .then (stats) ->
         if option is 'only'
@@ -50,7 +51,8 @@ module.exports = (robot) ->
       .then (data) ->
         current = data.stats.contributions.slice(-1)[0]
         today = moment().startOf 'day'
-        if moment(current.date).diff(today) < 0 or current.count is 0
+        isBad = moment(current.date).diff(today) < 0 or current.count is 0
+        if isBad
           msg = """
           #{NOTIFY_MESSAGE_BAD}
 
@@ -62,7 +64,8 @@ module.exports = (robot) ->
 
           #{data.msg}
           """
-        if mention
+        failedOnly and isBad
+        if mention and (not failedOnly or isBad)
           msg = "@#{mention} #{msg}"
         res.send msg
       .catch (err) ->

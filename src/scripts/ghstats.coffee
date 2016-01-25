@@ -46,7 +46,7 @@ module.exports = (robot) ->
         if option is 'only'
           return {msg: '', stats: stats}
         withGraph = option isnt 'text'
-        return getMessage(stats, withGraph).then (msg) -> {msg: msg, stats: stats}
+        return getMessage(username, stats, withGraph).then (msg) -> {msg: msg, stats: stats}
       .then (data) ->
         current = data.stats.contributions.slice(-1)[0]
         today = moment().startOf 'day'
@@ -79,7 +79,7 @@ module.exports = (robot) ->
     username = res.match[1]
     withGraph = not res.match[2]
     ghstats.fetchStats(username)
-      .then (stats) -> getMessage(stats, withGraph)
+      .then (stats) -> getMessage(username, stats, withGraph)
       .then (msg) -> res.send msg
       .catch (err) ->
         console.error err
@@ -90,11 +90,12 @@ module.exports = (robot) ->
         res.send msg
 
 
-getMessage = (stats, graph) ->
+getMessage = (username, stats, graph) ->
   msg = formatStats stats
   if GYAZO_TOKEN and graph
     return uploadImage(stats).then (image) ->
       return """
+      https://github.com/#{username}
       #{msg}
       #{image}
       """

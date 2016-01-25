@@ -4,7 +4,7 @@
 # Commands:
 #   hubot ghstats <username> [text] - Show user's GitHub contributions and streaks
 #   hubot ghstats <username> notify [text|only] - Notify user's GitHub contributions
-#   hubot ghstats <username> notify <@user> [text|only] - Notify user's GitHub contributions with mention
+#   hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] - Notify user's GitHub contributions with mention
 #
 # Configuration:
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE - Set message for error
@@ -39,7 +39,7 @@ GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 
 module.exports = (robot) ->
 
-  robot.respond /ghstats\s+([^\s]+)\s+notify(?:\s+(@[^\s]+))?(?:\s+(text|only))?$/i, (res) ->
+  robot.respond /ghstats\s+([^\s]+)\s+notify(?:\s+(?:(?:@|\[@\])([^\s]+)))?(?:\s+(text|only))?$/i, (res) ->
     [username, mention, option] = res.match.slice(1)
     ghstats.fetchStats(username)
       .then (stats) ->
@@ -63,7 +63,7 @@ module.exports = (robot) ->
           #{data.msg}
           """
         if mention
-          msg = "#{mention} #{msg}"
+          msg = "@#{mention} #{msg}"
         res.send msg
       .catch (err) ->
         console.error err

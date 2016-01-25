@@ -1,3 +1,13 @@
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.3.0...v0.3.1) (2016-01-25)
+
+
+### Bug Fixes
+
+* **hubot-github-contribution-stats:** Fix graph image (remove text) ([b6f2019](https://github.com/moqada/hubot-github-contribution-stats/commit/b6f2019))
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.2.0...v0.3.0) (2016-01-25)
 

@@ -8,6 +8,7 @@
 #   hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
 #
 # Configuration:
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK - Set disable GitHub link in message
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE - Set message for error
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE_404 - Set message when doesnot exist GitHub user
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_GOOD - Set message for notify when has contributions on today
@@ -25,6 +26,7 @@ moment = require 'moment'
 tempfile = require 'tempfile'
 
 PREFIX = 'HUBOT_GITHUB_CONTRIBUTION_STATS_'
+DISABLE_GITHUB_LINK = process.env["#{PREFIX}DISABLE_GITHUB_LINK"] or false
 ERROR_MESSAGE = process.env["#{PREFIX}ERROR_MESSAGE"] or 'Error'
 ERROR_MESSAGE_404 = (
   process.env["#{PREFIX}ERROR_MESSAGE_404"] or 'User doesnot exist'
@@ -95,10 +97,14 @@ module.exports = (robot) ->
 
 getMessage = (username, stats, graph) ->
   msg = formatStats stats
+  if not DISABLE_GITHUB_LINK
+    msg = """
+    https://github.com/#{username}
+    #{msg}
+    """
   if GYAZO_TOKEN and graph
     return uploadImage(stats).then (image) ->
       return """
-      https://github.com/#{username}
       #{msg}
       #{image}
       """

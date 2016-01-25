@@ -87,12 +87,13 @@ Current Streak: 140 days (2015-09-06 - 2016-01-23)
 ```
 hubot ghstats <username> [text] - Show user's GitHub contributions and streaks
 hubot ghstats <username> notify [text|only] - Notify user's GitHub contributions
-hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] - Notify user's GitHub contributions with mention
+hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
 ```
 
 ## Configurations
 
 ```
+HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK - Set disable GitHub link in message
 HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE - Set message for error
 HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE_404 - Set message when doesnot exist GitHub user
 HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_GOOD - Set message for notify when has contributions on today
@@ -100,9 +101,38 @@ HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when
 HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
 ```
 
+## Tips
+
+### Scheduled tasks
+
+If you want to notify every day. please use with [hubot-schedule](https://github.com/matsukaz/hubot-schedule).
+For example, following config is notify every 20 o'clock.
+
+```
+hubot schedule add "0 20 * * *" hubot ghstats moqada notify [@]moqada
+```
+
+send mention no contributions only.
+
+```
+hubot schedule add "0 20 * * *" hubot ghstats moqada notify [@]moqada failed-only
+```
+
+### HipChat
+
+Graph image does not expanded in HipChat when send with GitHub link.
+This solution is setting `HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK` or installing [hubot-regex-response](https://github.com/moqada/hubot-regex-response).
+
+If you choose [hubot-regex-response](https://github.com/moqada/hubot-regex-response), please set following environment variables.
+
+```
+HUBOT_REGEX_RESPONSE_CONFIGS='[{"from":"Contributions:(?:.+)\nLongest Streak:(?:.+)\nCurrent Streak:(?:.+)\n(https://[\\S]+)","to":"<%= m[1] %>"}]'
+```
+
 ## Demo
 
 ![](https://i.gyazo.com/ba6e3edef3e4d304eca32bd11aa105e1.png)
+
 
 [npm-url]: https://www.npmjs.com/package/hubot-github-contribution-stats
 [npm-image]: https://img.shields.io/npm/v/hubot-github-contribution-stats.svg?style=flat-square

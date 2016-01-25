@@ -122,7 +122,9 @@ formatStats = (stats) ->
 uploadImage = (stats) ->
   $cal = cheerio stats.calendar
   $cal.attr 'xmlns', 'http://www.w3.org/2000/svg'
-  png = svg2png.sync new Buffer($cal.toString())
+  width = $cal.attr 'width'
+  height = $cal.attr 'height'
+  png = svg2png.sync new Buffer($cal.toString()), {width: width, height: height}
   tempPath = tempfile('.png')
   fs.writeFileSync(tempPath, png)
   gyazo = new Gyazo(GYAZO_TOKEN)

@@ -100,6 +100,9 @@ HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when
 HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
 ```
 
+## Demo
+
+![](https://i.gyazo.com/ba6e3edef3e4d304eca32bd11aa105e1.png)
 
 [npm-url]: https://www.npmjs.com/package/hubot-github-contribution-stats
 [npm-image]: https://img.shields.io/npm/v/hubot-github-contribution-stats.svg?style=flat-square

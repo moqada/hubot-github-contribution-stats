@@ -27,7 +27,8 @@ Show Contributions and Streaks with graph
 
 ```
 Hubot> hubot ghstats moqada
-Hubot> Contributions: 1278 (2015-01-23 - 2016-01-23)
+Hubot> https://github.com/moqada
+Contributions: 1278 (2015-01-23 - 2016-01-23)
 Longest Streak: 140 days (2015-09-06 - 2016-01-23)
 Current Streak: 140 days (2015-09-06 - 2016-01-23)
 https://i.gyazo.com/34d59c9c4d184962420f9a20ba5e5f2a.png
@@ -37,7 +38,8 @@ Show Contributions and Streaks without graph
 
 ```
 Hubot> hubot ghstats moqada text
-Hubot> Contributions: 1278 (2015-01-23 - 2016-01-23)
+Hubot> https://github.com/moqada
+Contributions: 1278 (2015-01-23 - 2016-01-23)
 Longest Streak: 140 days (2015-09-06 - 2016-01-23)
 Current Streak: 140 days (2015-09-06 - 2016-01-23)
 ```
@@ -48,6 +50,7 @@ Notify exists Contributions on today
 Hubot> hubot ghstats moqada notify
 Hubot> No Contributions today...
 
+https://github.com/moqada
 Contributions: 1278 (2015-01-23 - 2016-01-23)
 Longest Streak: 140 days (2015-09-06 - 2016-01-23)
 Current Streak: 140 days (2015-09-06 - 2016-01-23)
@@ -60,6 +63,7 @@ Notify exists Contributions on today with mention
 Hubot> hubot ghstats moqada notify @moqada
 Hubot> @moqada No Contributions today...
 
+https://github.com/moqada
 Contributions: 1278 (2015-01-23 - 2016-01-23)
 Longest Streak: 140 days (2015-09-06 - 2016-01-23)
 Current Streak: 140 days (2015-09-06 - 2016-01-23)
@@ -77,6 +81,7 @@ Notify exists Contributions on today with mention without graph
 Hubot> hubot ghstats moqada notify @moqada text
 Hubot> @moqada No Contributions today...
 
+https://github.com/moqada
 Contributions: 1278 (2015-01-23 - 2016-01-23)
 Longest Streak: 140 days (2015-09-06 - 2016-01-23)
 Current Streak: 140 days (2015-09-06 - 2016-01-23)

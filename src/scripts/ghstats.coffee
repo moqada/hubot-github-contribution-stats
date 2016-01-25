@@ -132,6 +132,7 @@ formatStats = (stats) ->
 uploadImage = (stats) ->
   $cal = cheerio stats.calendar
   $cal.attr 'xmlns', 'http://www.w3.org/2000/svg'
+  $cal.find('text').remove()
   width = $cal.attr 'width'
   height = $cal.attr 'height'
   png = svg2png.sync new Buffer($cal.toString()), {width: width, height: height}

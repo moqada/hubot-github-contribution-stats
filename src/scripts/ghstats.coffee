@@ -3,9 +3,9 @@
 #   Notify GitHub Contributions and Streaks.
 #
 # Commands:
-#   hubot ghstats <username> [text] - Show user's GitHub contributions and streaks
-#   hubot ghstats <username> notify [text|only] - Notify user's GitHub contributions
-#   hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
+#   hubot ghstats [<name>|"<name1> <name2>..."] [text] - Show user's GitHub contributions and streaks
+#   hubot ghstats [<name>|"<name1> <name2>..."] notify [text|only] - Notify user's GitHub contributions
+#   hubot ghstats [<name>|"<name1> <name2>..."] notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
 #
 # Configuration:
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK - Set disable GitHub link in message
@@ -42,57 +42,64 @@ GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 
 module.exports = (robot) ->
 
-  robot.respond /ghstats\s+([^\s]+)\s+notify(?:\s+(?:(?:@|\[@\])([^\s]+)))?(?:\s+(text|only))?(?:\s+(failed-only))?$/i, (res) ->
-    [username, mention, option, failedOnly] = res.match.slice(1)
-    ghstats.fetchStats(username)
-      .then (stats) ->
-        if option is 'only'
-          return {msg: '', stats: stats}
-        withGraph = option isnt 'text'
-        return getMessage(username, stats, withGraph).then (msg) -> {msg: msg, stats: stats}
-      .then (data) ->
-        current = data.stats.contributions.slice(-1)[0]
-        today = moment().startOf 'day'
-        isBad = moment(current.date).diff(today) < 0 or current.count is 0
-        if isBad
-          msg = """
-          #{NOTIFY_MESSAGE_BAD}
+  robot.respond /ghstats\s+("[\s\w]+"|\w+)\s+notify(?:\s+(?:(?:@|\[@\])([^\s]+)))?(?:\s+(text|only))?(?:\s+(failed-only))?$/i, (res) ->
+    [usernames, mention, option, failedOnly] = res.match.slice(1)
+    usernames = parseUsernames usernames
+    usernames.forEach (username) ->
+      ghstats.fetchStats(username)
+        .then (stats) ->
+          if option is 'only'
+            return {msg: '', stats: stats}
+          withGraph = option isnt 'text'
+          return getMessage(username, stats, withGraph).then (msg) -> {msg: msg, stats: stats}
+        .then (data) ->
+          current = data.stats.contributions.slice(-1)[0]
+          today = moment().startOf 'day'
+          isBad = moment(current.date).diff(today) < 0 or current.count is 0
+          if isBad
+            msg = """
+            #{NOTIFY_MESSAGE_BAD}
 
-          #{data.msg}
-          """
-        else
-          msg = """
-          #{NOTIFY_MESSAGE_GOOD}
+            #{data.msg}
+            """
+          else
+            msg = """
+            #{NOTIFY_MESSAGE_GOOD}
 
-          #{data.msg}
-          """
-        failedOnly and isBad
-        if mention and (not failedOnly or isBad)
-          msg = "@#{mention} #{msg}"
-        res.send msg
-      .catch (err) ->
-        console.error err
-        if err.message is 'USER_NOT_FOUND'
-          msg = ERROR_MESSAGE_404
-        else
-          msg = ERROR_MESSAGE
-        if mention
-          msg = "#{mention} #{msg}"
-        res.send msg
+            #{data.msg}
+            """
+          failedOnly and isBad
+          if mention and (not failedOnly or isBad)
+            msg = "@#{mention} #{msg}"
+          res.send msg
+        .catch (err) ->
+          console.error err
+          if err.message is 'USER_NOT_FOUND'
+            msg = ERROR_MESSAGE_404
+          else
+            msg = ERROR_MESSAGE
+          if mention
+            msg = "#{mention} #{msg}"
+          res.send msg
 
-  robot.respond /ghstats\s([^\s]+)(?:\s+(text))?$/i, (res) ->
-    username = res.match[1]
+  robot.respond /ghstats\s+("[\s\w]+"|\w+)(?:\s+(text))?$/i, (res) ->
+    usernames = parseUsernames res.match[1]
     withGraph = not res.match[2]
-    ghstats.fetchStats(username)
-      .then (stats) -> getMessage(username, stats, withGraph)
-      .then (msg) -> res.send msg
-      .catch (err) ->
-        console.error err
-        if err.message is 'USER_NOT_FOUND'
-          msg = ERROR_MESSAGE_404
-        else
-          msg = ERROR_MESSAGE
-        res.send msg
+    usernames.forEach (username) ->
+      ghstats.fetchStats(username)
+        .then (stats) -> getMessage(username, stats, withGraph)
+        .then (msg) -> res.send msg
+        .catch (err) ->
+          console.error err
+          if err.message is 'USER_NOT_FOUND'
+            msg = ERROR_MESSAGE_404
+          else
+            msg = ERROR_MESSAGE
+          res.send msg
+
+
+parseUsernames = (string) ->
+  string.replace(/"/g, '').split(' ').filter (s) -> s
 
 
 getMessage = (username, stats, graph) ->

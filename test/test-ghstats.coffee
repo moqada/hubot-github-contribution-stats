@@ -15,7 +15,7 @@ describe 'ghstats', ->
   it 'help', ->
     helps = room.robot.helpCommands()
     assert.deepEqual helps, [
-      'hubot ghstats <username> [text] - Show user\'s GitHub contributions and streaks'
-      'hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user\'s GitHub contributions with mention'
-      'hubot ghstats <username> notify [text|only] - Notify user\'s GitHub contributions'
+      'hubot ghstats [<name>|"<name1> <name2>..."] [text] - Show user\'s GitHub contributions and streaks'
+      'hubot ghstats [<name>|"<name1> <name2>..."] notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user\'s GitHub contributions with mention'
+      'hubot ghstats [<name>|"<name1> <name2>..."] notify [text|only] - Notify user\'s GitHub contributions'
     ]

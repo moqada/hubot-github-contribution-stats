@@ -14,6 +14,7 @@
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_GOOD - Set message for notify when has contributions on today
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when doesnot have contributions on today
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH - Set resending graph image (for HipChat)
 #
 # Author:
 #   moqada <moqada@gmail.com>
@@ -38,6 +39,7 @@ NOTIFY_MESSAGE_BAD = (
   process.env["#{PREFIX}NOTIFY_MESSAGE_BAD"] or 'No Contributions today...'
 )
 GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
+RESEND_GRAPH = process.env["#{PREFIX}RESEND_GRAPH"]
 
 
 module.exports = (robot) ->
@@ -51,27 +53,26 @@ module.exports = (robot) ->
           if option is 'only'
             return {msg: '', stats: stats}
           withGraph = option isnt 'text'
-          return getMessage(username, stats, withGraph).then (msg) -> {msg: msg, stats: stats}
-        .then (data) ->
-          current = data.stats.contributions.slice(-1)[0]
-          today = moment().startOf 'day'
-          isBad = moment(current.date).diff(today) < 0 or current.count is 0
-          if isBad
-            msg = """
-            #{NOTIFY_MESSAGE_BAD}
-
-            #{data.msg}
-            """
-          else
+          return createContext(username, stats, withGraph)
+        .then (ctx) ->
+          isGood = hasContributionsToday(ctx)
+          if isGood
             msg = """
             #{NOTIFY_MESSAGE_GOOD}
 
-            #{data.msg}
+            #{ctx.message}
             """
-          failedOnly and isBad
-          if mention and (not failedOnly or isBad)
+          else
+            msg = """
+            #{NOTIFY_MESSAGE_BAD}
+
+            #{ctx.message}
+            """
+          if mention and (not failedOnly or not isGood)
             msg = "@#{mention} #{msg}"
           res.send msg
+          if withGraph and RESEND_GRAPH
+            res.send ctx.image
         .catch (err) ->
           console.error err
           if err.message is 'USER_NOT_FOUND'
@@ -85,10 +86,14 @@ module.exports = (robot) ->
   robot.respond /ghstats\s+("[\s\w]+"|\w+)(?:\s+(text))?$/i, (res) ->
     usernames = parseUsernames res.match[1]
     withGraph = not res.match[2]
+    console.log RESEND_GRAPH
     usernames.forEach (username) ->
       ghstats.fetchStats(username)
-        .then (stats) -> getMessage(username, stats, withGraph)
-        .then (msg) -> res.send msg
+        .then (stats) -> createContext(username, stats, withGraph)
+        .then (ctx) ->
+          res.send ctx.message
+          if withGraph and RESEND_GRAPH
+            res.send ctx.image
         .catch (err) ->
           console.error err
           if err.message is 'USER_NOT_FOUND'
@@ -98,11 +103,7 @@ module.exports = (robot) ->
           res.send msg
 
 
-parseUsernames = (string) ->
-  string.replace(/"/g, '').split(' ').filter (s) -> s
-
-
-getMessage = (username, stats, graph) ->
+createContext = (username, stats, graph) ->
   msg = formatStats stats
   if not DISABLE_GITHUB_LINK
     msg = """
@@ -111,11 +112,22 @@ getMessage = (username, stats, graph) ->
     """
   if GYAZO_TOKEN and graph
     return uploadImage(stats).then (image) ->
-      return """
+      msg = """
       #{msg}
       #{image}
       """
-  return Promise.resolve msg
+      {message: msg, image: image}
+  return Promise.resolve {message: msg, image: image, stats: stats}
+
+
+hasContributionsToday = (stats) ->
+  current = stats.contributions.slice(-1)[0]
+  today = moment().startOf 'day'
+  return not (moment(current.date).diff(today) < 0 or current.count is 0)
+
+
+parseUsernames = (string) ->
+  string.replace(/"/g, '').split(' ').filter (s) -> s
 
 
 formatStats = (stats) ->

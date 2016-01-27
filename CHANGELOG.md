@@ -1,3 +1,14 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.3.1...v0.4.0) (2016-01-27)
+
+
+### Features
+
+* **hubot-github-contribution-stats:** Add RESEND_GRAPH config (for HipChat) ([f1154d3](https://github.com/moqada/hubot-github-contribution-stats/commit/f1154d3))
+* **hubot-github-contribution-stats:** Support multiple usernames ([306a14c](https://github.com/moqada/hubot-github-contribution-stats/commit/306a14c))
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.3.0...v0.3.1) (2016-01-25)
 

@@ -86,7 +86,6 @@ module.exports = (robot) ->
   robot.respond /ghstats\s+("[\s\w]+"|\w+)(?:\s+(text))?$/i, (res) ->
     usernames = parseUsernames res.match[1]
     withGraph = not res.match[2]
-    console.log RESEND_GRAPH
     usernames.forEach (username) ->
       ghstats.fetchStats(username)
         .then (stats) -> createContext(username, stats, withGraph)

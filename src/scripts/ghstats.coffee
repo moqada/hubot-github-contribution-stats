@@ -47,12 +47,13 @@ module.exports = (robot) ->
   robot.respond /ghstats\s+("[\s\w]+"|\w+)\s+notify(?:\s+(?:(?:@|\[@\])([^\s]+)))?(?:\s+(text|only))?(?:\s+(failed-only))?$/i, (res) ->
     [usernames, mention, option, failedOnly] = res.match.slice(1)
     usernames = parseUsernames usernames
-    usernames.forEach (username) ->
+    withGraph = option isnt 'text'
+
+    send = (username) ->
       ghstats.fetchStats(username)
         .then (stats) ->
           if option is 'only'
             return {msg: '', stats: stats}
-          withGraph = option isnt 'text'
           return createContext(username, stats, withGraph)
         .then (ctx) ->
           isGood = hasContributionsToday(ctx.stats)
@@ -72,7 +73,11 @@ module.exports = (robot) ->
             msg = "@#{mention} #{msg}"
           res.send msg
           if withGraph and RESEND_GRAPH
-            res.send ctx.image
+            return new Promise (resolve) ->
+              setTimeout ->
+                resolve res.send ctx.image
+              , 500
+          return
         .catch (err) ->
           console.error err
           if err.message is 'USER_NOT_FOUND'
@@ -83,16 +88,26 @@ module.exports = (robot) ->
             msg = "#{mention} #{msg}"
           res.send msg
 
+    promise = Promise.resolve()
+    usernames.forEach (username) ->
+      promise = promise.then -> send(username)
+
+
   robot.respond /ghstats\s+("[\s\w]+"|\w+)(?:\s+(text))?$/i, (res) ->
     usernames = parseUsernames res.match[1]
     withGraph = not res.match[2]
-    usernames.forEach (username) ->
+
+    send = (username) ->
       ghstats.fetchStats(username)
         .then (stats) -> createContext(username, stats, withGraph)
         .then (ctx) ->
           res.send ctx.message
           if withGraph and RESEND_GRAPH
-            res.send ctx.image
+            return new Promise (resolve) ->
+              setTimeout ->
+                resolve res.send ctx.image
+              , 500
+          return
         .catch (err) ->
           console.error err
           if err.message is 'USER_NOT_FOUND'
@@ -100,6 +115,11 @@ module.exports = (robot) ->
           else
             msg = ERROR_MESSAGE
           res.send msg
+
+    promise = Promise.resolve()
+    usernames.forEach (username) ->
+      promise = promise.then -> send(username)
+
 
 
 createContext = (username, stats, graph) ->
@@ -115,7 +135,7 @@ createContext = (username, stats, graph) ->
       #{msg}
       #{image}
       """
-      {message: msg, image: image}
+      {message: msg, image: image, stats: stats}
   return Promise.resolve {message: msg, image: image, stats: stats}
 
 

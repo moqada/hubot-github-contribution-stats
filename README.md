@@ -34,6 +34,27 @@ Current Streak: 140 days (2015-09-06 - 2016-01-23)
 https://i.gyazo.com/34d59c9c4d184962420f9a20ba5e5f2a.png
 ```
 
+Show Contributions and Streaks of multiple users
+
+```
+Hubot> hubot ghstats "moqada achiku ideyuta"
+Hubot> https://github.com/achiku
+Contributions: 694 (2015-01-27 - 2016-01-27)
+Longest Streak: 21 days (2015-12-30 - 2016-01-19)
+Current Streak: 0 days
+https://i.gyazo.com/5834155a2e62558a46af13c0005465a6.png
+https://github.com/ideyuta
+Contributions: 829 (2015-01-27 - 2016-01-27)
+Longest Streak: 23 days (2016-01-05 - 2016-01-27)
+Current Streak: 23 days (2016-01-05 - 2016-01-27)
+https://i.gyazo.com/4e5dc1a595f9c29e0745d193dc9902fa.png
+https://github.com/moqada
+Contributions: 1320 (2015-01-27 - 2016-01-27)
+Longest Streak: 144 days (2015-09-06 - 2016-01-27)
+Current Streak: 144 days (2015-09-06 - 2016-01-27)
+https://i.gyazo.com/13f2a364a9871b00d6dddc7d78e8bd62.png
+```
+
 Show Contributions and Streaks without graph
 
 ```

@@ -55,7 +55,7 @@ module.exports = (robot) ->
           withGraph = option isnt 'text'
           return createContext(username, stats, withGraph)
         .then (ctx) ->
-          isGood = hasContributionsToday(ctx)
+          isGood = hasContributionsToday(ctx.stats)
           if isGood
             msg = """
             #{NOTIFY_MESSAGE_GOOD}

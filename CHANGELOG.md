@@ -1,3 +1,14 @@
+<a name="0.4.1"></a>
+## [0.4.1](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.4.0...v0.4.1) (2016-01-27)
+
+
+### Bug Fixes
+
+* **hubot-github-contribution-stats:** Fix notify error ([b58399a](https://github.com/moqada/hubot-github-contribution-stats/commit/b58399a))
+* **hubot-github-contribution-stats:** Remove console ([707180b](https://github.com/moqada/hubot-github-contribution-stats/commit/707180b))
+
+
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.3.1...v0.4.0) (2016-01-27)
 

@@ -10,9 +10,9 @@
 # Configuration:
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK - Set disable GitHub link in message
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE - Set message for error
-#   HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE_404 - Set message when doesnot exist GitHub user
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE_404 - Set message when does not exist GitHub user
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_GOOD - Set message for notify when has contributions on today
-#   HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when doesnot have contributions on today
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when does not have contributions on today
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH - Set resending graph image (for HipChat)
 #
@@ -30,7 +30,7 @@ PREFIX = 'HUBOT_GITHUB_CONTRIBUTION_STATS_'
 DISABLE_GITHUB_LINK = process.env["#{PREFIX}DISABLE_GITHUB_LINK"] or false
 ERROR_MESSAGE = process.env["#{PREFIX}ERROR_MESSAGE"] or 'Error'
 ERROR_MESSAGE_404 = (
-  process.env["#{PREFIX}ERROR_MESSAGE_404"] or 'User doesnot exist'
+  process.env["#{PREFIX}ERROR_MESSAGE_404"] or 'User does not exist'
 )
 NOTIFY_MESSAGE_GOOD = (
   process.env["#{PREFIX}NOTIFY_MESSAGE_GOOD"] or 'Nice Contributions!'

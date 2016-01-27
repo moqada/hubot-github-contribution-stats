@@ -90,9 +90,9 @@ Current Streak: 140 days (2015-09-06 - 2016-01-23)
 ## Commands
 
 ```
-hubot ghstats <username> [text] - Show user's GitHub contributions and streaks
-hubot ghstats <username> notify [text|only] - Notify user's GitHub contributions
-hubot ghstats <username> notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
+hubot ghstats [<name>|"<name1> <name2>..."] [text] - Show user's GitHub contributions and streaks
+hubot ghstats [<name>|"<name1> <name2>..."] notify [text|only] - Notify user's GitHub contributions
+hubot ghstats [<name>|"<name1> <name2>..."] notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
 ```
 
 ## Configurations
@@ -104,6 +104,7 @@ HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE_404 - Set message when doesnot exi
 HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_GOOD - Set message for notify when has contributions on today
 HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when doesnot have contributions on today
 HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
+HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH - Set resending graph image (for HipChat)
 ```
 
 ## Tips
@@ -126,13 +127,8 @@ hubot schedule add "0 20 * * *" hubot ghstats moqada notify [@]moqada failed-onl
 ### HipChat
 
 Graph image does not expanded in HipChat when send with GitHub link.
-This solution is setting `HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK` or installing [hubot-regex-response](https://github.com/moqada/hubot-regex-response).
+This solution is setting `HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK` or `HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH`.
 
-If you choose [hubot-regex-response](https://github.com/moqada/hubot-regex-response), please set following environment variables.
-
-```
-HUBOT_REGEX_RESPONSE_CONFIGS='[{"from":"Contributions:(?:.+)\nLongest Streak:(?:.+)\nCurrent Streak:(?:.+)\n(https://[\\S]+)","to":"<%= m[1] %>"}]'
-```
 
 ## Demo
 

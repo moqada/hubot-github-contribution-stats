@@ -136,7 +136,7 @@ createContext = (username, stats, graph) ->
       #{image}
       """
       {message: msg, image: image, stats: stats}
-  return Promise.resolve {message: msg, image: image, stats: stats}
+  return Promise.resolve {message: msg, image: null, stats: stats}
 
 
 hasContributionsToday = (stats) ->

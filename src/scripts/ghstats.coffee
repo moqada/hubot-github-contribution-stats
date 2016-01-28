@@ -41,112 +41,124 @@ NOTIFY_MESSAGE_BAD = (
 GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 RESEND_GRAPH = process.env["#{PREFIX}RESEND_GRAPH"]
 
+NOTIFY_REGEX = '(".+"|\\w+) notify(?: (?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: (failed-only))?'
+SHOW_REGEX = '(".+"|\\w+)(?: (text))?'
+
 
 module.exports = (robot) ->
 
-  robot.respond /ghstats\s+("[\s\w]+"|\w+)\s+notify(?:\s+(?:(?:@|\[@\])([^\s]+)))?(?:\s+(text|only))?(?:\s+(failed-only))?$/i, (res) ->
-    [usernames, mention, option, failedOnly] = res.match.slice(1)
-    usernames = parseUsernames usernames
-    withGraph = option isnt 'text'
-
-    send = (username) ->
-      ghstats.fetchStats(username)
-        .then (stats) ->
-          if option is 'only'
-            return {msg: '', stats: stats}
-          return createContext(username, stats, withGraph)
-        .then (ctx) ->
-          isGood = hasContributionsToday(ctx.stats)
-          if isGood
-            msg = """
-            #{NOTIFY_MESSAGE_GOOD}
-
-            #{ctx.message}
-            """
-          else
-            msg = """
-            #{NOTIFY_MESSAGE_BAD}
-
-            #{ctx.message}
-            """
-          if mention and (not failedOnly or not isGood)
-            msg = "@#{mention} #{msg}"
-          res.send msg
-          if withGraph and RESEND_GRAPH
-            return new Promise (resolve) ->
-              setTimeout ->
-                resolve res.send ctx.image
-              , 500
-          return
-        .catch (err) ->
-          console.error err
-          if err.message is 'USER_NOT_FOUND'
-            msg = ERROR_MESSAGE_404
-          else
-            msg = ERROR_MESSAGE
-          if mention
-            msg = "#{mention} #{msg}"
-          res.send msg
-
-    promise = Promise.resolve()
-    usernames.forEach (username) ->
-      promise = promise.then -> send(username)
-
-
-  robot.respond /ghstats\s+("[\s\w]+"|\w+)(?:\s+(text))?$/i, (res) ->
+  robot.respond new RegExp("ghstats #{SHOW_REGEX}$", 'i'), (res) ->
     usernames = parseUsernames res.match[1]
-    withGraph = not res.match[2]
-
-    send = (username) ->
-      ghstats.fetchStats(username)
-        .then (stats) -> createContext(username, stats, withGraph)
-        .then (ctx) ->
-          res.send ctx.message
-          if withGraph and RESEND_GRAPH
-            return new Promise (resolve) ->
-              setTimeout ->
-                resolve res.send ctx.image
-              , 500
-          return
-        .catch (err) ->
-          console.error err
-          if err.message is 'USER_NOT_FOUND'
-            msg = ERROR_MESSAGE_404
-          else
-            msg = ERROR_MESSAGE
-          res.send msg
-
+    opts = {display: res.match[2]}
     promise = Promise.resolve()
     usernames.forEach (username) ->
-      promise = promise.then -> send(username)
+      promise = promise.then -> showStats res, username, opts
+
+  robot.respond new RegExp("ghstats #{NOTIFY_REGEX}$", 'i'), (res) ->
+    [usernames, mention, display, failedOnly] = res.match.slice(1)
+    opts = {failedOnly: failedOnly, display: display}
+    usernames = parseUsernames usernames
+    promise = Promise.resolve()
+    usernames.forEach (username) ->
+      promise = promise.then -> notifyStats res, username, mention, opts
 
 
+parseUsernames = (string) ->
+  string.replace(/"/g, '').split(' ').filter (s) -> s
 
-createContext = (username, stats, graph) ->
+
+showStats = (res, username, opts) ->
+  hasGraph = opts.display isnt 'text'
+  ghstats.fetchStats(username)
+    .then (stats) ->
+      if not hasGraph
+        return {stats: stats, image: null}
+      return createGraphUrl(stats).then (image) -> {stats: stats, image: image}
+    .then (ctx) ->
+      return Object.assign
+        message: createCommonMessage username, ctx.stats, ctx.image
+    .then (ctx) ->
+      res.send ctx.message
+      if hasGraph and RESEND_GRAPH
+        return resendGraph res, ctx.image
+    .catch (err) ->
+      console.error err
+      if err.message is 'USER_NOT_FOUND'
+        msg = ERROR_MESSAGE_404
+      else
+        msg = ERROR_MESSAGE
+      res.send msg
+
+
+notifyStats = (res, username, mention, opts) ->
+  hasGraph = opts.display not in ['text', 'only']
+  ghstats.fetchStats(username)
+    .then (stats) ->
+      if not hasGraph
+        return {stats, image: null}
+      return createGraphUrl(stats).then (image) -> {stats, image}
+    .then (ctx) ->
+      if opts.display is 'only'
+        return Object.assign {}, ctx, message: ''
+      return Object.assign {}, ctx,
+        message: createCommonMessage username, ctx.stats, ctx.image
+    .then (ctx) ->
+      isGood = hasContributionsToday ctx.stats
+      msg = if isGood then NOTIFY_MESSAGE_GOOD else NOTIFY_MESSAGE_BAD
+      if ctx.message
+        msg = """
+        #{msg}
+
+        #{ctx.message}
+        """
+      if mention and (not opts.failedOnly or not isGood)
+        msg = "@#{mention} #{msg}"
+      res.send msg
+      if hasGraph and RESEND_GRAPH
+        return resendGraph res, ctx.image
+    .catch (err) ->
+      console.error err
+      if err.message is 'USER_NOT_FOUND'
+        msg = ERROR_MESSAGE_404
+      else
+        msg = ERROR_MESSAGE
+      if mention
+        msg = "@#{mention} #{msg}"
+      res.send msg
+
+
+resendGraph = (res, image) ->
+  new Promise (resolve) ->
+    setTimeout ->
+      resolve res.send image
+    , 500
+
+
+createGraphUrl = (stats) ->
+  if GYAZO_TOKEN
+    return uploadImage(stats)
+  Promise.resolve null
+
+
+createCommonMessage = (username, stats, image) ->
   msg = formatStats stats
   if not DISABLE_GITHUB_LINK
     msg = """
     https://github.com/#{username}
     #{msg}
     """
-  if GYAZO_TOKEN and graph
-    return uploadImage(stats).then (image) ->
-      msg = """
-      #{msg}
-      #{image}
-      """
-      {message: msg, image: image, stats: stats}
-  return Promise.resolve {message: msg, image: null, stats: stats}
+  if image
+    msg = """
+    #{msg}
+    #{image}
+    """
+  return msg
 
 
 hasContributionsToday = (stats) ->
   current = stats.contributions.slice(-1)[0]
   today = moment().startOf 'day'
   return not (moment(current.date).diff(today) < 0 or current.count is 0)
-
-
-parseUsernames = (string) ->
-  string.replace(/"/g, '').split(' ').filter (s) -> s
 
 
 formatStats = (stats) ->
@@ -166,6 +178,7 @@ formatStats = (stats) ->
   #{lStreakRow}
   #{cStreakRow}
   """
+
 
 uploadImage = (stats) ->
   $cal = cheerio stats.calendar

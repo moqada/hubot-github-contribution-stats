@@ -23,6 +23,8 @@ Then add **hubot-github-contribution-stats** to your `external-scripts.json`:
 
 ## Sample Interaction
 
+### Show
+
 Show Contributions and Streaks with graph
 
 ```
@@ -64,6 +66,8 @@ Contributions: 1278 (2015-01-23 - 2016-01-23)
 Longest Streak: 140 days (2015-09-06 - 2016-01-23)
 Current Streak: 140 days (2015-09-06 - 2016-01-23)
 ```
+
+### Notification
 
 Notify exists Contributions on today
 

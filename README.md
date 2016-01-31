@@ -9,6 +9,10 @@
 
 Notify GitHub Contributions and Streaks.
 
+## Demo
+
+![](https://i.gyazo.com/366b005577de8b37c56d2d33414bb6c0.png)
+
 ## Installation
 
 ```
@@ -153,11 +157,6 @@ hubot schedule add "0 20 * * *" hubot ghstats moqada notify [@]moqada failed-onl
 
 Graph image does not expanded in HipChat when send with GitHub link.
 This solution is setting `HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK` or `HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH`.
-
-
-## Demo
-
-![](https://i.gyazo.com/ba6e3edef3e4d304eca32bd11aa105e1.png)
 
 
 [npm-url]: https://www.npmjs.com/package/hubot-github-contribution-stats

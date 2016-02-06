@@ -19,6 +19,15 @@
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when does not have contributions on today
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH - Set resending graph image (for HipChat)
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_ADD_SCHEDULE_SUCCESS_MESSAGE - Set message when success adding scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_ADD_SCHEDULE_ERROR_MESSAGE - Set message when error adding scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_CANCEL_SCHEDULE_SUCCESS_MESSAGE - Set message when success canceling scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_CANCEL_SCHEDULE_ERROR_MESSAGE - Set message when error canceling scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_CANCEL_SCHEDULE_NOTFOUND_MESSAGE - Set message when does not exist canceling scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_LIST_SCHEDULE_EMPTY_MESSAGE - Set message when does not exist scheduled jobs
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_SUCCESS_MESSAGE - Set message when success updating scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_ERROR_MESSAGE - Set message when error updating scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATSUPDATE_SCHEDULE_NOTFOUND_MESSAGE - Set message when does not exist updating scheduled job
 #
 # Author:
 #   moqada <moqada@gmail.com>
@@ -31,24 +40,46 @@ moment = require 'moment'
 tempfile = require 'tempfile'
 {Scheduler, Job} = require '../scheduler'
 
+
 PREFIX = 'HUBOT_GITHUB_CONTRIBUTION_STATS_'
 DISABLE_GITHUB_LINK = process.env["#{PREFIX}DISABLE_GITHUB_LINK"] or false
-ERROR_MESSAGE = process.env["#{PREFIX}ERROR_MESSAGE"] or 'Error'
-ERROR_MESSAGE_404 = (
-  process.env["#{PREFIX}ERROR_MESSAGE_404"] or 'User does not exist'
-)
-NOTIFY_MESSAGE_GOOD = (
-  process.env["#{PREFIX}NOTIFY_MESSAGE_GOOD"] or 'Nice Contributions!'
-)
-NOTIFY_MESSAGE_BAD = (
-  process.env["#{PREFIX}NOTIFY_MESSAGE_BAD"] or 'No Contributions today...'
-)
 GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 RESEND_GRAPH = process.env["#{PREFIX}RESEND_GRAPH"]
-
 STORE_KEY = 'hubot-github-contribution-stats:jobs'
 NOTIFY_REGEX = '(".+"|\\w+) notify(?: (?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: (failed-only))?'
 SHOW_REGEX = '(".+"|\\w+)(?: (text))?'
+MESSAGES =
+  error: process.env["#{PREFIX}ERROR_MESSAGE"] or 'Error'
+  error404: process.env["#{PREFIX}ERROR_MESSAGE_404"] or 'User does not exist'
+  notifyGood: process.env["#{PREFIX}NOTIFY_MESSAGE_GOOD"] or 'Nice Contributions!'
+  notifyBad: process.env["#{PREFIX}NOTIFY_MESSAGE_BAD"] or 'No Contributions today...'
+  addScheduleSuccess: (
+    process.env["#{PREFIX}ADD_SCHEDULE_SUCCESS_MESSAGE"] or 'Scheduled ghstats task created.'
+  )
+  addScheduleError: (
+    process.env["#{PREFIX}ADD_SCHEDULE_ERROR_MESSAGE"] or 'Scheduled ghstats task could not create.'
+  )
+  cancelScheduleSuccess: (
+    process.env["#{PREFIX}CANCEL_SCHEDULE_SUCCESS_MESSAGE"] or 'Scheduled ghstats task canceld.'
+  )
+  cancelScheduleError: (
+    process.env["#{PREFIX}CANCEL_SCHEDULE_ERROR_MESSAGE"] or 'Scheduled ghstats task could not cancel.'
+  )
+  cancelScheduleNotfound: (
+    process.env["#{PREFIX}CANCEL_SCHEDULE_NOTFOUND_MESSAGE"] or 'Scheduled ghstats task does not exists.'
+  )
+  listScheduleEmpty: (
+    process.env["#{PREFIX}LIST_SCHEDULE_EMPTY_MESSAGE"] or 'Schedule tasks does not exists.'
+  )
+  updateScheduleSuccess: (
+    process.env["#{PREFIX}UPDATE_SCHEDULE_SUCCESS_MESSAGE"] or 'Scheduled ghstats task updated.'
+  )
+  updateScheduleError: (
+    process.env["#{PREFIX}UPDATE_SCHEDULE_ERROR_MESSAGE"] or 'Scheduled ghstats task could not update.'
+  )
+  updateScheduleNotfound: (
+    process.env["#{PREFIX}UPDATE_SCHEDULE_NOTFOUND_MESSAGE"] or 'Scheduled ghstats task does not exists.'
+  )
 
 module.exports = (robot) ->
 
@@ -71,9 +102,9 @@ module.exports = (robot) ->
     {user} = res.message
     try
       job = scheduler.createJob pattern, user, {type, source, usernames, options}
-      res.send "#{job.id}: Scheduled ghstats task created."
+      res.send "#{job.id}: #{MESSAGES.addScheduleSuccess}"
     catch err
-      res.send "Scheduled ghstats task could not create. (#{err.message})"
+      res.send "#{MESSAGES.addScheduleError} (#{err.message})"
       throw err
 
   robot.respond new RegExp('ghstats schedule (?:edit|update) (\\d+) (.+)$', 'i'), (res) ->
@@ -85,26 +116,29 @@ module.exports = (robot) ->
     {user} = res.message
     try
       scheduler.updateJob id, {type, source, usernames, options}
-      res.send "#{job.id}: Scheduled ghstats task created."
+      res.send "#{job.id}: #{MESSAGES.updateScheduleSuccess}"
     catch err
-      res.send "Scheduled ghstats task could not create. (#{err.message})"
+      if err.name is 'JobNotFound'
+        return res.send "#{id}: #{MESSAGES.updateScheduleNotfound}"
+      res.send "#{MESSAGES.updateScheduleError} (#{err.message})"
       throw err
 
   robot.respond new RegExp('ghstats schedule (?:cancel|del|delete|remove|rm) (\\w+)$', 'i'), (res) ->
     id = res.match[1]
     try
       scheduler.cancelJob id
-      res.send "#{id}: Scheduled ghstats task canceld."
+      res.send "#{id}: #{MESSAGES.cancelScheduleSuccess}"
     catch err
       if err.name is 'JobNotFound'
-        return res.send "#{id}: Scheduled ghstats task does not exists."
+        return res.send "#{id}: #{MESSAGES.cancelScheduleNotfound}"
+      res.send "#{id}: #{MESSAGES.cancelScheduleError} (#{err.message})"
       throw err
 
   robot.respond new RegExp('ghstats schedule (?:ls|list)$', 'i'), (res) ->
     msgs = ("#{id}: [#{job.pattern}] ##{job.getRoom()} #{job.meta.source}" for id, job of scheduler.jobs)
     if msgs.length > 0
       return res.send msgs.join '\n'
-    res.send 'Schedule tasks does not exists.'
+    res.send MESSAGES.listScheduleEmpty
 
 
 parseShowArgs = (matches) ->
@@ -163,9 +197,9 @@ showStats = (sender, username, opts) ->
     .catch (err) ->
       console.error err
       if err.message is 'USER_NOT_FOUND'
-        msg = ERROR_MESSAGE_404
+        msg = MESSAGES.error404
       else
-        msg = ERROR_MESSAGE
+        msg = MESSAGES.error
       sender.send msg
 
 
@@ -184,7 +218,7 @@ notifyStats = (sender, username, opts) ->
         message: createCommonMessage username, ctx.stats, ctx.image
     .then (ctx) ->
       isGood = hasContributionsToday ctx.stats
-      msg = if isGood then NOTIFY_MESSAGE_GOOD else NOTIFY_MESSAGE_BAD
+      msg = if isGood then MESSAGES.notifyGood else MESSAGES.notifyBad
       if ctx.message
         msg = """
         #{msg}
@@ -199,9 +233,9 @@ notifyStats = (sender, username, opts) ->
     .catch (err) ->
       console.error err
       if err.message is 'USER_NOT_FOUND'
-        msg = ERROR_MESSAGE_404
+        msg = MESSAGES.error404
       else
-        msg = ERROR_MESSAGE
+        msg = MESSAGES.error
       if mention
         msg = "@#{mention} #{msg}"
       sender.send msg

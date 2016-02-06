@@ -108,7 +108,7 @@ class Job
     @user = {}
     @user[k] = v for k, v of user
 
-  createExec: (robot) ->
+  exec: (robot) ->
     # ex.
     #
     # ```
@@ -122,9 +122,8 @@ class Job
     @user.room or @user.reply_to
 
   start: (robot) ->
-    exec = @createExec robot
     @job = schedule.scheduleJob @pattern, =>
-      exec()
+      @exec robot
       @cb?()
 
   cancel: ->

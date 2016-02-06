@@ -108,7 +108,7 @@ module.exports = (robot) ->
       throw err
 
   robot.respond new RegExp('ghstats schedule (?:edit|update) (\\d+) (.+)$', 'i'), (res) ->
-    [pattern, id, source] = res.match.slice(1, 4)
+    [id, source] = res.match.slice(1, 4)
     parsed = parseScheduleArgs source
     if not parsed
       return
@@ -116,7 +116,7 @@ module.exports = (robot) ->
     {user} = res.message
     try
       scheduler.updateJob id, {type, source, usernames, options}
-      res.send "#{job.id}: #{MESSAGES.updateScheduleSuccess}"
+      res.send "#{id}: #{MESSAGES.updateScheduleSuccess}"
     catch err
       if err.name is 'JobNotFound'
         return res.send "#{id}: #{MESSAGES.updateScheduleNotfound}"
@@ -316,7 +316,7 @@ uploadImage = (stats) ->
 
 class GHJob extends Job
 
-  createExec: (robot) ->
+  exec: (robot) ->
     envelope = user: @user, room: @getRoom()
     sender =
       send: (msg) ->
@@ -324,9 +324,8 @@ class GHJob extends Job
       reply: (msg) ->
         robot.reply envelope, msg
     if @meta.type is 'show'
-      exec = show
+      func = show
     else if @meta.type is 'notify'
-      exec = notify
+      func = notify
     {usernames, options} = @meta
-    ->
-      exec sender, usernames, options
+    func sender, usernames, options

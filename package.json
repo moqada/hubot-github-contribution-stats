@@ -8,9 +8,11 @@
   },
   "dependencies": {
     "cheerio": "^0.20.0",
+    "cron-parser": "^1.1.0",
     "github-contribution-stats": "^0.2.0",
     "gyazo-api": "^0.3.0",
     "moment": "^2.11.1",
+    "node-schedule": "^1.0.0",
     "svg2png": "^3.0.0",
     "tempfile": "^1.1.1"
   },

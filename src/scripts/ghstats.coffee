@@ -6,6 +6,10 @@
 #   hubot ghstats [<name>|"<name1> <name2>..."] [text] - Show user's GitHub contributions and streaks
 #   hubot ghstats [<name>|"<name1> <name2>..."] notify [text|only] - Notify user's GitHub contributions
 #   hubot ghstats [<name>|"<name1> <name2>..."] notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
+#   hubot ghstats schedule [add|new] "<pattern>" <command> - Add scheduled job
+#   hubot ghstats schedule [edit|update] <id> <command> - Update scheduled job
+#   hubot ghstats schedule [cancel|del|delete|remove|rm] <id> - Cancel scheduled job
+#   hubot ghstats schedule [ls|list] - List scheduled jobs
 #
 # Configuration:
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK - Set disable GitHub link in message
@@ -25,6 +29,7 @@ svg2png = require 'svg2png'
 ghstats = require 'github-contribution-stats'
 moment = require 'moment'
 tempfile = require 'tempfile'
+{Scheduler, Job} = require '../scheduler'
 
 PREFIX = 'HUBOT_GITHUB_CONTRIBUTION_STATS_'
 DISABLE_GITHUB_LINK = process.env["#{PREFIX}DISABLE_GITHUB_LINK"] or false
@@ -41,33 +46,107 @@ NOTIFY_MESSAGE_BAD = (
 GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 RESEND_GRAPH = process.env["#{PREFIX}RESEND_GRAPH"]
 
+STORE_KEY = 'hubot-github-contribution-stats:jobs'
 NOTIFY_REGEX = '(".+"|\\w+) notify(?: (?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: (failed-only))?'
 SHOW_REGEX = '(".+"|\\w+)(?: (text))?'
 
-
 module.exports = (robot) ->
 
+  scheduler = new Scheduler(robot, STORE_KEY, GHJob)
+
   robot.respond new RegExp("ghstats #{SHOW_REGEX}$", 'i'), (res) ->
-    usernames = parseUsernames res.match[1]
-    opts = {display: res.match[2]}
-    promise = Promise.resolve()
-    usernames.forEach (username) ->
-      promise = promise.then -> showStats res, username, opts
+    {usernames, options} = parseShowArgs res.match.slice(1)
+    show res, usernames, options
 
   robot.respond new RegExp("ghstats #{NOTIFY_REGEX}$", 'i'), (res) ->
-    [usernames, mention, display, failedOnly] = res.match.slice(1)
-    opts = {failedOnly: failedOnly, display: display}
-    usernames = parseUsernames usernames
-    promise = Promise.resolve()
-    usernames.forEach (username) ->
-      promise = promise.then -> notifyStats res, username, mention, opts
+    {usernames, options} = parseNotifyArgs res.match.slice(1)
+    notify res, usernames, options
 
+  robot.respond new RegExp('ghstats schedule (?:add|new) "(.+)" (.+)$', 'i'), (res) ->
+    [pattern, source] = res.match.slice(1, 3)
+    parsed = parseScheduleArgs source
+    if not parsed
+      return
+    {type, usernames, options} = parsed
+    {user} = res.message
+    try
+      job = scheduler.createJob pattern, user, {type, source, usernames, options}
+      res.send "#{job.id}: Scheduled ghstats task created."
+    catch err
+      res.send "Scheduled ghstats task could not create. (#{err.message})"
+      throw err
+
+  robot.respond new RegExp('ghstats schedule (?:edit|update) (\\d+) (.+)$', 'i'), (res) ->
+    [pattern, id, source] = res.match.slice(1, 4)
+    parsed = parseScheduleArgs source
+    if not parsed
+      return
+    {type, usernames, options} = parsed
+    {user} = res.message
+    try
+      scheduler.updateJob id, {type, source, usernames, options}
+      res.send "#{job.id}: Scheduled ghstats task created."
+    catch err
+      res.send "Scheduled ghstats task could not create. (#{err.message})"
+      throw err
+
+  robot.respond new RegExp('ghstats schedule (?:cancel|del|delete|remove|rm) (\\w+)$', 'i'), (res) ->
+    id = res.match[1]
+    try
+      scheduler.cancelJob id
+      res.send "#{id}: Scheduled ghstats task canceld."
+    catch err
+      if err.name is 'JobNotFound'
+        return res.send "#{id}: Scheduled ghstats task does not exists."
+      throw err
+
+  robot.respond new RegExp('ghstats schedule (?:ls|list)$', 'i'), (res) ->
+    msgs = ("#{id}: [#{job.pattern}] ##{job.getRoom()} #{job.meta.source}" for id, job of scheduler.jobs)
+    if msgs.length > 0
+      return res.send msgs.join '\n'
+    res.send 'Schedule tasks does not exists.'
+
+
+parseShowArgs = (matches) ->
+  [usernames, display] = matches
+  options = {display}
+  usernames = parseUsernames usernames
+  return {usernames, options}
+
+parseNotifyArgs = (matches) ->
+  [usernames, mention, display, failedOnly] = matches
+  options = {failedOnly, display, mention}
+  usernames = parseUsernames usernames
+  return {usernames, options}
+
+parseScheduleArgs = (source) ->
+  type = 'notify'
+  matches = new RegExp("^#{NOTIFY_REGEX}$", 'i').exec source
+  parser = parseNotifyArgs
+  if not matches
+    matches = new RegExp("^#{SHOW_REGEX}$", 'i').exec source
+    if not matches
+      return
+    parser = parseShowArgs
+    type = 'show'
+  {usernames, options} = parser matches.slice(1)
+  return {usernames, options, type}
 
 parseUsernames = (string) ->
   string.replace(/"/g, '').split(' ').filter (s) -> s
 
 
-showStats = (res, username, opts) ->
+show = (sender, usernames, opts) ->
+  promise = Promise.resolve()
+  usernames.forEach (username) ->
+    promise = promise.then -> showStats sender, username, opts
+
+notify = (sender, usernames, opts) ->
+  promise = Promise.resolve()
+  usernames.forEach (username) ->
+    promise = promise.then -> notifyStats sender, username, opts
+
+showStats = (sender, username, opts) ->
   hasGraph = opts.display isnt 'text'
   ghstats.fetchStats(username)
     .then (stats) ->
@@ -78,20 +157,21 @@ showStats = (res, username, opts) ->
       return Object.assign
         message: createCommonMessage username, ctx.stats, ctx.image
     .then (ctx) ->
-      res.send ctx.message
+      sender.send ctx.message
       if hasGraph and RESEND_GRAPH
-        return resendGraph res, ctx.image
+        return resendGraph sender, ctx.image
     .catch (err) ->
       console.error err
       if err.message is 'USER_NOT_FOUND'
         msg = ERROR_MESSAGE_404
       else
         msg = ERROR_MESSAGE
-      res.send msg
+      sender.send msg
 
 
-notifyStats = (res, username, mention, opts) ->
+notifyStats = (sender, username, opts) ->
   hasGraph = opts.display not in ['text', 'only']
+  {mention} = opts
   ghstats.fetchStats(username)
     .then (stats) ->
       if not hasGraph
@@ -113,9 +193,9 @@ notifyStats = (res, username, mention, opts) ->
         """
       if mention and (not opts.failedOnly or not isGood)
         msg = "@#{mention} #{msg}"
-      res.send msg
+      sender.send msg
       if hasGraph and RESEND_GRAPH
-        return resendGraph res, ctx.image
+        return resendGraph sender.send, ctx.image
     .catch (err) ->
       console.error err
       if err.message is 'USER_NOT_FOUND'
@@ -124,13 +204,13 @@ notifyStats = (res, username, mention, opts) ->
         msg = ERROR_MESSAGE
       if mention
         msg = "@#{mention} #{msg}"
-      res.send msg
+      sender.send msg
 
 
-resendGraph = (res, image) ->
+resendGraph = (sender, image) ->
   new Promise (resolve) ->
     setTimeout ->
-      resolve res.send image
+      resolve sender.send image
     , 500
 
 
@@ -197,3 +277,21 @@ uploadImage = (stats) ->
     .catch (err) ->
       fs.unlinkSync tempPath
       throw err
+
+
+class GHJob extends Job
+
+  createExec: (robot) ->
+    envelope = user: @user, room: @getRoom()
+    sender =
+      send: (msg) ->
+        robot.send envelope, msg
+      reply: (msg) ->
+        robot.reply envelope, msg
+    if @meta.type is 'show'
+      exec = show
+    else if @meta.type is 'notify'
+      exec = notify
+    {usernames, options} = @meta
+    ->
+      exec sender, usernames, options

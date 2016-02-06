@@ -5,7 +5,7 @@
 # Commands:
 #   hubot ghstats [<name>|"<name1> <name2>..."] [text] - Show user's GitHub contributions and streaks
 #   hubot ghstats [<name>|"<name1> <name2>..."] notify [text|only] - Notify user's GitHub contributions
-#   hubot ghstats [<name>|"<name1> <name2>..."] notify[:<@user>|:<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
+#   hubot ghstats [<name>|"<name1> <name2>..."] notify[:<@user>|:<[@]user>] [text|only] [failed-only:[mention|send]] [good:"<message>"] [bad:"<message>"] - Notify user's GitHub contributions with mention
 #   hubot ghstats schedule [add|new] "<pattern>" <command> - Add scheduled job
 #   hubot ghstats schedule [edit|update] <id> <command> - Update scheduled job
 #   hubot ghstats schedule [cancel|del|delete|remove|rm] <id> - Cancel scheduled job
@@ -46,7 +46,7 @@ DISABLE_GITHUB_LINK = process.env["#{PREFIX}DISABLE_GITHUB_LINK"] or false
 GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 RESEND_GRAPH = process.env["#{PREFIX}RESEND_GRAPH"]
 STORE_KEY = 'hubot-github-contribution-stats:jobs'
-NOTIFY_REGEX = '(".+"|\\w+) notify(?:(?:=|:)(?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: (failed-only))?'
+NOTIFY_REGEX = '(".+"|\\w+) notify(?:(?:=|:)(?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: failed-only(?:=|:)(mention|send))?(?: good(?:=|:)"(.+?)")?(?: bad(?:=|:)"(.+?)")?'
 SHOW_REGEX = '(".+"|\\w+)(?: (text))?'
 MESSAGES =
   error: process.env["#{PREFIX}ERROR_MESSAGE"] or 'Error'
@@ -148,8 +148,8 @@ parseShowArgs = (matches) ->
   return {usernames, options}
 
 parseNotifyArgs = (matches) ->
-  [usernames, mention, display, failedOnly] = matches
-  options = {failedOnly, display, mention}
+  [usernames, mention, display, failedOnly, msgGood, msgBad] = matches
+  options = {failedOnly, display, mention, msgGood, msgBad}
   usernames = parseUsernames usernames
   return {usernames, options}
 
@@ -205,7 +205,7 @@ showStats = (sender, username, opts) ->
 
 notifyStats = (sender, username, opts) ->
   hasGraph = opts.display not in ['text', 'only']
-  {mention} = opts
+  {mention, msgGood, msgBad} = opts
   ghstats.fetchStats(username)
     .then (stats) ->
       if not hasGraph
@@ -218,18 +218,19 @@ notifyStats = (sender, username, opts) ->
         message: createCommonMessage username, ctx.stats, ctx.image
     .then (ctx) ->
       isGood = hasContributionsToday ctx.stats
-      msg = if isGood then MESSAGES.notifyGood else MESSAGES.notifyBad
+      msg = if isGood then msgGood or MESSAGES.notifyGood else msgBad or MESSAGES.notifyBad
       if ctx.message
         msg = """
         #{msg}
 
         #{ctx.message}
         """
-      if mention and (not opts.failedOnly or not isGood)
+      if mention and (opts.failedOnly isnt 'mention' or not isGood)
         msg = "@#{mention} #{msg}"
-      sender.send msg
-      if hasGraph and RESEND_GRAPH
-        return resendGraph sender.send, ctx.image
+      if opts.failedOnly isnt 'send' or not isGood
+        sender.send msg
+        if hasGraph and RESEND_GRAPH
+          return resendGraph sender.send, ctx.image
     .catch (err) ->
       console.error err
       if err.message is 'USER_NOT_FOUND'

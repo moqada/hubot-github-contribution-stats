@@ -5,7 +5,7 @@
 # Commands:
 #   hubot ghstats [<name>|"<name1> <name2>..."] [text] - Show user's GitHub contributions and streaks
 #   hubot ghstats [<name>|"<name1> <name2>..."] notify [text|only] - Notify user's GitHub contributions
-#   hubot ghstats [<name>|"<name1> <name2>..."] notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
+#   hubot ghstats [<name>|"<name1> <name2>..."] notify[:<@user>|:<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
 #   hubot ghstats schedule [add|new] "<pattern>" <command> - Add scheduled job
 #   hubot ghstats schedule [edit|update] <id> <command> - Update scheduled job
 #   hubot ghstats schedule [cancel|del|delete|remove|rm] <id> - Cancel scheduled job
@@ -46,7 +46,7 @@ DISABLE_GITHUB_LINK = process.env["#{PREFIX}DISABLE_GITHUB_LINK"] or false
 GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 RESEND_GRAPH = process.env["#{PREFIX}RESEND_GRAPH"]
 STORE_KEY = 'hubot-github-contribution-stats:jobs'
-NOTIFY_REGEX = '(".+"|\\w+) notify(?: (?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: (failed-only))?'
+NOTIFY_REGEX = '(".+"|\\w+) notify(?:(?:=|:)(?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: (failed-only))?'
 SHOW_REGEX = '(".+"|\\w+)(?: (text))?'
 MESSAGES =
   error: process.env["#{PREFIX}ERROR_MESSAGE"] or 'Error'

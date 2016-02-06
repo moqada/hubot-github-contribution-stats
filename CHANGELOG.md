@@ -1,3 +1,45 @@
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.4.2...v0.5.0) (2016-02-06)
+
+
+### Bug Fixes
+
+* **hubot-github-contribution-stats:** Change notify format ([741c591](https://github.com/moqada/hubot-github-contribution-stats/commit/741c591))
+* **hubot-github-contribution-stats:** Fix error on no GYAZO_TOKEN ([fb1a987](https://github.com/moqada/hubot-github-contribution-stats/commit/fb1a987))
+
+### Features
+
+* **hubot-github-contribution-stats:** Add configs of messages ([099371a](https://github.com/moqada/hubot-github-contribution-stats/commit/099371a))
+* **hubot-github-contribution-stats:** Add options: failed-only, good, bad ([9406a0e](https://github.com/moqada/hubot-github-contribution-stats/commit/9406a0e))
+* **hubot-github-contribution-stats:** Add schedule command ([5797525](https://github.com/moqada/hubot-github-contribution-stats/commit/5797525))
+
+
+### BREAKING CHANGES
+
+* Change failed-only format
+
+Before:
+
+`hubot ghstats moqada notify failed-only`
+
+After:
+
+```
+hubot ghstats moqada notify failed-only:mention
+hubot ghstats moqada notify failed-only:send
+```
+* Change notify format.
+
+Before:
+
+`hubot ghstats moqada notify [@]moqada`
+
+After:
+
+`hubot ghstats moqada notify:[@]moqada`
+
+
+
 <a name="0.4.2"></a>
 ## [0.4.2](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.4.1...v0.4.2) (2016-01-27)
 

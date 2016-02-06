@@ -9,6 +9,8 @@
 
 Notify GitHub Contributions and Streaks.
 
+:clock2: Support Recurrence and Scheduled notifications.
+
 ## Demo
 
 ![](https://i.gyazo.com/366b005577de8b37c56d2d33414bb6c0.png)
@@ -73,7 +75,7 @@ Current Streak: 140 days (2015-09-06 - 2016-01-23)
 
 ### Notification
 
-Notify exists Contributions on today
+Notify today's Contributions
 
 ```
 Hubot> hubot ghstats moqada notify
@@ -86,10 +88,10 @@ Current Streak: 140 days (2015-09-06 - 2016-01-23)
 https://i.gyazo.com/34d59c9c4d184962420f9a20ba5e5f2a.png
 ```
 
-Notify exists Contributions on today with mention
+Notify today's Contributions with mention
 
 ```
-Hubot> hubot ghstats moqada notify @moqada
+Hubot> hubot ghstats moqada notify:@moqada
 Hubot> @moqada No Contributions today...
 
 https://github.com/moqada
@@ -99,15 +101,15 @@ Current Streak: 140 days (2015-09-06 - 2016-01-23)
 https://i.gyazo.com/34d59c9c4d184962420f9a20ba5e5f2a.png
 ```
 
-Notify exists Contributions on today with mention only message
+Notify today's Contributions with mention only message
 ```
-Hubot> hubot ghstats moqada notify @moqada only
+Hubot> hubot ghstats moqada notify:@moqada only
 Hubot> @moqada No Contributions today...
 ```
 
-Notify exists Contributions on today with mention without graph
+Notify today's Contributions with mention without graph
 ```
-Hubot> hubot ghstats moqada notify @moqada text
+Hubot> hubot ghstats moqada notify:@moqada text
 Hubot> @moqada No Contributions today...
 
 https://github.com/moqada
@@ -116,31 +118,110 @@ Longest Streak: 140 days (2015-09-06 - 2016-01-23)
 Current Streak: 140 days (2015-09-06 - 2016-01-23)
 ```
 
+Notify today's Contributions with mention if user does not have conntributions
+```
+Hubot> hubot ghstats moqada notify:@moqada failed-only:send
+# today's Contributions exists: No send
+```
+
+Notify today's Contributions without mention if user have conntributions
+```
+Hubot> hubot ghstats moqada notify:@moqada failed-only:mention
+Hubot> Contributions today...
+
+https://github.com/moqada
+Contributions: 1278 (2015-01-23 - 2016-01-23)
+Longest Streak: 140 days (2015-09-06 - 2016-01-23)
+Current Streak: 140 days (2015-09-06 - 2016-01-23)
+```
+
+### Scheduled task
+
+Add Recurrence task by cron fromat. (ex. every 19:00)
+```
+Hubot> hubot ghstats schedule add "0 19 * * *" moqada notify:@moqada
+9999: Scheduled ghstats task created.
+```
+
+Add Scheduled task by date fromat. (ex. 2016-02-20 19:00)
+```
+Hubot> hubot ghstats schedule add "2016-02-20 19:00" moqada notify:@moqada
+8888: Scheduled ghstats task created.
+```
+
+Update Scheduled task
+```
+Hubot> hubot ghstats schedule update 9999 achiku notify:@achiku
+Hubot> 9999: Scheduled ghstats task updated. 
+```
+
+Cancel Scheduled task
+```
+Hubot> hubot ghstats schedule del 9999
+Hubot> 9999: Scheduled ghstats task canceld.
+```
+
+List Scheduled tasks
+```
+Hubot> hubot ghstats schedule ls
+2864: [Sat Feb 20 2016 09:00:00 GMT+0900 (JST)] #Shell achiku notify:[@]here
+3537: [10/* * * * * *] #Shell moqada notify:[@]moqada failed-only:send bad:"Fuck!!!"
+```
+
+
 ## Commands
 
 ```
 hubot ghstats [<name>|"<name1> <name2>..."] [text] - Show user's GitHub contributions and streaks
 hubot ghstats [<name>|"<name1> <name2>..."] notify [text|only] - Notify user's GitHub contributions
-hubot ghstats [<name>|"<name1> <name2>..."] notify [<@user>|<[@]user>] [text|only] [failed-only] - Notify user's GitHub contributions with mention
+hubot ghstats [<name>|"<name1> <name2>..."] notify[:<@user>|:<[@]user>] [text|only] [failed-only:[mention|send]] [good:"<message>"] [bad:"<message>"] - Notify user's GitHub contributions with mention
+hubot ghstats schedule [add|new] "<pattern>" <command> - Add scheduled job
+hubot ghstats schedule [edit|update] <id> <command> - Update scheduled job
+hubot ghstats schedule [cancel|del|delete|remove|rm] <id> - Cancel scheduled job
+hubot ghstats schedule [ls|list] - List scheduled jobs
 ```
 
 ## Configurations
 
 ```
 HUBOT_GITHUB_CONTRIBUTION_STATS_DISABLE_GITHUB_LINK - Set disable GitHub link in message
+HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
+HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH - Set resending graph image (for HipChat)
 HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE - Set message for error
 HUBOT_GITHUB_CONTRIBUTION_STATS_ERROR_MESSAGE_404 - Set message when does not exist GitHub user
 HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_GOOD - Set message for notify when has contributions on today
 HUBOT_GITHUB_CONTRIBUTION_STATS_NOTIFY_MESSAGE_BAD - Set message for notify when does not have contributions on today
-HUBOT_GITHUB_CONTRIBUTION_STATS_GYAZO_TOKEN - Set Gyazo API Token for upload graph image
-HUBOT_GITHUB_CONTRIBUTION_STATS_RESEND_GRAPH - Set resending graph image (for HipChat)
+HUBOT_GITHUB_CONTRIBUTION_STATS_ADD_SCHEDULE_SUCCESS_MESSAGE - Set message when success adding scheduled job
+HUBOT_GITHUB_CONTRIBUTION_STATS_ADD_SCHEDULE_ERROR_MESSAGE - Set message when error adding scheduled job
+HUBOT_GITHUB_CONTRIBUTION_STATS_CANCEL_SCHEDULE_SUCCESS_MESSAGE - Set message when success canceling scheduled job
+HUBOT_GITHUB_CONTRIBUTION_STATS_CANCEL_SCHEDULE_ERROR_MESSAGE - Set message when error canceling scheduled job
+HUBOT_GITHUB_CONTRIBUTION_STATS_CANCEL_SCHEDULE_NOTFOUND_MESSAGE - Set message when does not exist canceling scheduled job
+HUBOT_GITHUB_CONTRIBUTION_STATS_LIST_SCHEDULE_EMPTY_MESSAGE - Set message when does not exist scheduled jobs
+HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_SUCCESS_MESSAGE - Set message when success updating scheduled job
+HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_ERROR_MESSAGE - Set message when error updating scheduled job
+HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_NOTFOUND_MESSAGE - Set message when does not exist updating scheduled job
 ```
 
 ## Tips
 
 ### Scheduled tasks
 
-If you want to notify every day. please use with [hubot-schedule](https://github.com/matsukaz/hubot-schedule).
+If you want to notify every day.
+For example, following config is...
+
+- notify every 20 o'clock
+- notify only mention at 21 - 23 o'clock when today's contributions does not exist
+- notify only mention with custom message at 23:30 o'clock when today's contributions does not exist
+
+```
+hubot ghstats schedule add "0 20 * * *" moqada notify:[@]moqada
+hubot ghstats schedule add "0 21-23 * * *" moqada notify:[@]moqada only failed-only:send
+hubot ghstats schedule add "30 23 * * *" moqada notify:[@]moqada only failed-only:send bad:"Please commit!"
+```
+
+
+Another way: use with [hubot-schedule](https://github.com/matsukaz/hubot-schedule).
+
 For example, following config is notify every 20 o'clock.
 
 ```

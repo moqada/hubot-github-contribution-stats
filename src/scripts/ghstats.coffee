@@ -27,7 +27,7 @@
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_LIST_SCHEDULE_EMPTY_MESSAGE - Set message when does not exist scheduled jobs
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_SUCCESS_MESSAGE - Set message when success updating scheduled job
 #   HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_ERROR_MESSAGE - Set message when error updating scheduled job
-#   HUBOT_GITHUB_CONTRIBUTION_STATSUPDATE_SCHEDULE_NOTFOUND_MESSAGE - Set message when does not exist updating scheduled job
+#   HUBOT_GITHUB_CONTRIBUTION_STATS_UPDATE_SCHEDULE_NOTFOUND_MESSAGE - Set message when does not exist updating scheduled job
 #
 # Author:
 #   moqada <moqada@gmail.com>

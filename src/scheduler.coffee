@@ -80,7 +80,7 @@ class Scheduler
 
   createJobFromBrain: (id, data) ->
     {pattern, user, meta} = data
-    createJob pattern, user, meta, {id}
+    @createJob pattern, user, meta, {id}
 
   storeJobToBrain: (id, job) ->
     @robot.brain.get(@storeKey)[id] = job.serialize()

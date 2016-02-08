@@ -158,7 +158,7 @@ Hubot> 9999: Scheduled ghstats task updated.
 Cancel Scheduled task
 ```
 Hubot> hubot ghstats schedule del 9999
-Hubot> 9999: Scheduled ghstats task canceld.
+Hubot> 9999: Scheduled ghstats task canceled.
 ```
 
 List Scheduled tasks

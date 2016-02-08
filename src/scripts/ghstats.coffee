@@ -60,7 +60,7 @@ MESSAGES =
     process.env["#{PREFIX}ADD_SCHEDULE_ERROR_MESSAGE"] or 'Scheduled ghstats task could not create.'
   )
   cancelScheduleSuccess: (
-    process.env["#{PREFIX}CANCEL_SCHEDULE_SUCCESS_MESSAGE"] or 'Scheduled ghstats task canceld.'
+    process.env["#{PREFIX}CANCEL_SCHEDULE_SUCCESS_MESSAGE"] or 'Scheduled ghstats task canceled.'
   )
   cancelScheduleError: (
     process.env["#{PREFIX}CANCEL_SCHEDULE_ERROR_MESSAGE"] or 'Scheduled ghstats task could not cancel.'

@@ -46,8 +46,8 @@ DISABLE_GITHUB_LINK = process.env["#{PREFIX}DISABLE_GITHUB_LINK"] or false
 GYAZO_TOKEN = process.env["#{PREFIX}GYAZO_TOKEN"]
 RESEND_GRAPH = process.env["#{PREFIX}RESEND_GRAPH"]
 STORE_KEY = 'hubot-github-contribution-stats:jobs'
-NOTIFY_REGEX = '(".+"|\\w+) notify(?:(?:=|:)(?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: failed-only(?:=|:)(mention|send))?(?: good(?:=|:)"(.+?)")?(?: bad(?:=|:)"(.+?)")?'
-SHOW_REGEX = '(".+"|\\w+)(?: (text))?'
+NOTIFY_REGEX = '(".+?"|\\w+) notify(?:(?:=|:)(?:(?:@|\\[@\\])(\\w+)))?(?: (text|only))?(?: failed-only(?:=|:)(mention|send))?(?: good(?:=|:)"(.+?)")?(?: bad(?:=|:)"(.+?)")?'
+SHOW_REGEX = '(".+?"|\\w+)(?: (text))?'
 MESSAGES =
   error: process.env["#{PREFIX}ERROR_MESSAGE"] or 'Error'
   error404: process.env["#{PREFIX}ERROR_MESSAGE_404"] or 'User does not exist'
@@ -93,7 +93,7 @@ module.exports = (robot) ->
     {usernames, options} = parseNotifyArgs res.match.slice(1)
     notify res, usernames, options
 
-  robot.respond new RegExp('ghstats schedule (?:add|new) "(.+)" (.+)$', 'i'), (res) ->
+  robot.respond new RegExp('ghstats schedule (?:add|new) "(.+?)" (.+)$', 'i'), (res) ->
     [pattern, source] = res.match.slice(1, 3)
     parsed = parseScheduleArgs source
     if not parsed

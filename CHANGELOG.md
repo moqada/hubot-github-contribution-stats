@@ -1,3 +1,14 @@
+<a name="0.5.1"></a>
+## [0.5.1](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.0...v0.5.1) (2016-02-09)
+
+
+### Bug Fixes
+
+* **hubot-github-contribution-stats:** :bug: Fix typo ([b119d3b](https://github.com/moqada/hubot-github-contribution-stats/commit/b119d3b))
+* **hubot-github-contribution-stats:** Fix RegExp for schedule pattern ([320c968](https://github.com/moqada/hubot-github-contribution-stats/commit/320c968))
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.4.2...v0.5.0) (2016-02-06)
 

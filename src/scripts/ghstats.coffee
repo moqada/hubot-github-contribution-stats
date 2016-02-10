@@ -188,7 +188,7 @@ showStats = (sender, username, opts) ->
         return {stats: stats, image: null}
       return createGraphUrl(stats).then (image) -> {stats: stats, image: image}
     .then (ctx) ->
-      return Object.assign
+      return Object.assign {}, ctx,
         message: createCommonMessage username, ctx.stats, ctx.image
     .then (ctx) ->
       sender.send ctx.message
@@ -230,7 +230,7 @@ notifyStats = (sender, username, opts) ->
       if opts.failedOnly isnt 'send' or not isGood
         sender.send msg
         if hasGraph and RESEND_GRAPH
-          return resendGraph sender.send, ctx.image
+          return resendGraph sender, ctx.image
     .catch (err) ->
       console.error err
       if err.message is 'USER_NOT_FOUND'

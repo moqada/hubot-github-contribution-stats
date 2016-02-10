@@ -1,3 +1,13 @@
+<a name="0.5.3"></a>
+## [0.5.3](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.2...v0.5.3) (2016-02-10)
+
+
+### Bug Fixes
+
+* **hubot-github-contribution-stats:** Fix RegExp for username ([2666629](https://github.com/moqada/hubot-github-contribution-stats/commit/2666629))
+
+
+
 <a name="0.5.2"></a>
 ## [0.5.2](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.1...v0.5.2) (2016-02-10)
 

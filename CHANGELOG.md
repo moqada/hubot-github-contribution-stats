@@ -1,3 +1,13 @@
+<a name="0.5.4"></a>
+## [0.5.4](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.3...v0.5.4) (2016-02-18)
+
+
+### Dependencies
+
+* Scheduler replace to @moqada/hubot-schedule-helper ([#2](https://github.com/moqada/hubot-github-contribution-stats/pull/2))
+
+
+
 <a name="0.5.3"></a>
 ## [0.5.3](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.2...v0.5.3) (2016-02-10)
 

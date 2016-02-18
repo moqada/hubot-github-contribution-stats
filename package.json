@@ -1,7 +1,7 @@
 {
   "name": "hubot-github-contribution-stats",
   "description": "Notify GitHub Contributions and Streaks",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": "moqada <moqada@gmail.com>",
   "bugs": {
     "url": "https://github.com/moqada/hubot-github-contribution-stats/issues"

@@ -37,8 +37,8 @@ Gyazo = require 'gyazo-api'
 svg2png = require 'svg2png'
 ghstats = require 'github-contribution-stats'
 moment = require 'moment'
+{Scheduler, Job} = require '@moqada/hubot-schedule-helper'
 tempfile = require 'tempfile'
-{Scheduler, Job} = require '../scheduler'
 
 
 PREFIX = 'HUBOT_GITHUB_CONTRIBUTION_STATS_'
@@ -83,7 +83,7 @@ MESSAGES =
 
 module.exports = (robot) ->
 
-  scheduler = new Scheduler(robot, STORE_KEY, GHJob)
+  scheduler = new Scheduler({robot, storeKey: STORE_KEY, job: GHJob})
 
   robot.respond new RegExp("ghstats #{SHOW_REGEX}$", 'i'), (res) ->
     {usernames, options} = parseShowArgs res.match.slice(1)
@@ -101,7 +101,11 @@ module.exports = (robot) ->
     {type, usernames, options} = parsed
     {user} = res.message
     try
-      job = scheduler.createJob pattern, user, {type, source, usernames, options}
+      job = scheduler.createJob {
+        pattern,
+        user,
+        meta: {type, source, usernames, options}
+      }
       res.send "#{job.id}: #{MESSAGES.addScheduleSuccess}"
     catch err
       res.send "#{MESSAGES.addScheduleError} (#{err.message})"
@@ -317,7 +321,7 @@ uploadImage = (stats) ->
 class GHJob extends Job
 
   exec: (robot) ->
-    envelope = user: @user, room: @getRoom()
+    envelope = @getEnvelope()
     sender =
       send: (msg) ->
         robot.send envelope, msg

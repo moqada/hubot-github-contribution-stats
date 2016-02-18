@@ -7,12 +7,11 @@
     "url": "https://github.com/moqada/hubot-github-contribution-stats/issues"
   },
   "dependencies": {
+    "@moqada/hubot-schedule-helper": "^1.0.0",
     "cheerio": "^0.20.0",
-    "cron-parser": "^1.1.0",
     "github-contribution-stats": "^0.2.0",
     "gyazo-api": "^0.3.0",
     "moment": "^2.11.2",
-    "node-schedule": "^1.0.0",
     "svg2png": "^3.0.0",
     "tempfile": "^1.1.1"
   },

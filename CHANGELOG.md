@@ -1,3 +1,13 @@
+<a name="0.5.5"></a>
+## [0.5.5](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.4...v0.5.5) (2016-06-07)
+
+
+### Dependencies
+
+* Update github-contribution-stats to 0.3.0 supporting new GitHub contributions. ([#6](https://github.com/moqada/hubot-github-contribution-stats/pull/6))
+
+
+
 <a name="0.5.4"></a>
 ## [0.5.4](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.3...v0.5.4) (2016-02-18)
 

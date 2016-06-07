@@ -9,7 +9,7 @@
   "dependencies": {
     "@moqada/hubot-schedule-helper": "^1.0.0",
     "cheerio": "^0.20.0",
-    "github-contribution-stats": "^0.2.0",
+    "github-contribution-stats": "^0.3.0",
     "gyazo-api": "^0.3.0",
     "moment": "^2.11.2",
     "svg2png": "^3.0.0",

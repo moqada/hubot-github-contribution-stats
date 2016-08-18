@@ -23,7 +23,7 @@
     "hubot": "^2.18.0",
     "hubot-test-helper": "^1.4.4",
     "mocha": "^3.0.0",
-    "npm-run-all": "^2.1.0",
+    "npm-run-all": "^3.0.0",
     "power-assert": "^1.2.0"
   },
   "files": [

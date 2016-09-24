@@ -16,7 +16,7 @@
     "tempfile": "^1.1.1"
   },
   "devDependencies": {
-    "coffee-script": "^1.10.0",
+    "coffee-script": "^1.11.0",
     "coffeelint": "^1.14.2",
     "coffeelint-config-moqada": "^1.0.0",
     "espower-coffee": "^1.0.1",

@@ -1,3 +1,12 @@
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.5...v0.6.0) (2016-09-27)
+
+### BREAKING CHANGES
+
+- Requires Node.js version 5 (#14)[https://github.com/moqada/hubot-github-contribution-stats/pull/14]
+
+
+
 <a name="0.5.5"></a>
 ## [0.5.5](https://github.com/moqada/hubot-github-contribution-stats/compare/v0.5.4...v0.5.5) (2016-06-07)
 

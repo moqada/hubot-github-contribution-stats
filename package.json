@@ -12,7 +12,7 @@
     "github-contribution-stats": "^0.3.0",
     "gyazo-api": "^0.3.0",
     "moment": "^2.11.2",
-    "svg2png": "^3.0.0",
+    "svg2png": "3.0.1",
     "tempfile": "^1.1.1"
   },
   "devDependencies": {
@@ -25,6 +25,9 @@
     "mocha": "^3.0.0",
     "npm-run-all": "^3.0.0",
     "power-assert": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=5"
   },
   "files": [
     "index.coffee",

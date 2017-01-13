@@ -27,7 +27,7 @@
     "power-assert": "^1.2.0"
   },
   "engines": {
-    "node": ">=5"
+    "node": ">=6"
   },
   "files": [
     "index.coffee",

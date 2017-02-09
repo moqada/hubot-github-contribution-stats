@@ -12,7 +12,7 @@
     "github-contribution-stats": "^0.3.0",
     "gyazo-api": "^0.3.0",
     "moment": "^2.11.2",
-    "svg2png": "4.0.0",
+    "svg2png": "4.1.1",
     "tempfile": "^1.1.1"
   },
   "devDependencies": {

@@ -1,5 +1,7 @@
 # hubot-github-contribution-stats
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/moqada/hubot-github-contribution-stats.svg)](https://greenkeeper.io/)
+
 [![NPM version][npm-image]][npm-url]
 [![NPM downloads][npm-download-image]][npm-download-url]
 [![Build Status][travis-image]][travis-url]

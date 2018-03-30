@@ -11,7 +11,7 @@
     "cheerio": "^0.22.0",
     "github-contribution-stats": "^0.3.0",
     "gyazo-api": "^0.3.0",
-    "moment": "^2.11.2",
+    "moment": "^2.22.0",
     "svg2png": "4.1.1",
     "tempfile": "^2.0.0"
   },
